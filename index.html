@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Erinnerungs-App</title>
+    <style>
+:root {
+    --background: #121212;
+    --surface: #1e1e1e;
+    --primary: #bb86fc;
+    --secondary: #03dac6;
+    --on-background: #ffffff;
+    --on-surface: #ffffff;
+    --danger: #cf6679;
+    --success: #03dac6;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: var(--background);
+    color: var(--on-background);
+}
+
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.greeting {
+    display: flex;
+    align-items: center;
+}
+
+#greetingEmoji {
+    font-size: 24px;
+    margin-right: 10px;
+}
+
+h1, h2 {
+    color: var(--primary);
+    margin: 0;
+}
+
+.menu-btn {
+    background: none;
+    border: none;
+    color: var(--on-background);
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0;
+}
+
+.new-reminder-btn, .back-btn, #reminderForm button {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    background-color: var(--primary);
+    color: var(--on-background);
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+#reminderList {
+    list-style-type: none;
+    padding: 0;
+}
+
+#reminderList li {
+    background-color: var(--surface);
+    margin-bottom: 10px;
+    padding: 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.reminder-text {
+    font-weight: bold;
+    color: var(--secondary);
+}
+
+.hidden {
+    display: none;
+}
+
+input, textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: var(--surface);
+    color: var(--on-surface);
+    box-sizing: border-box;
+}
+
+.side-menu {
+    position: fixed;
+    top: 0;
+    right: -300px;
+    width: 300px;
+    height: 100%;
+    background-color: var(--surface);
+    transition: right 0.3s ease-in-out;
+    z-index: 1000;
+    overflow-y: auto;
+}
+
+.side-menu.open {
+    right: 0;
+}
+
+.side-menu-content {
+    padding: 20px;
+}
+
+@media (max-width: 600px) {
+    .side-menu {
+        width: 100%;
+        right: -100%;
+    }
+}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="mainView">
+            <div class="header">
+                <div class="greeting">
+                    <span id="greetingEmoji"></span>
+                    <h1>Hallo <span id="userName"></span></h1>
+                </div>
+                <button class="menu-btn" onclick="toggleSideMenu()">☰</button>
+            </div>
+            <button class="new-reminder-btn" onclick="showNewReminderForm()">Neue Erinnerung</button>
+            <ul id="reminderList"></ul>
+        </div>
+        
+        <div id="newReminderView" class="hidden">
+            <button class="back-btn" onclick="showMainView()">Zurück</button>
+            <h2>Neue Erinnerung</h2>
+            <form id="reminderForm">
+                <input type="text" id="reminderText" placeholder="Erinnerungstext" required>
+                <textarea id="note" placeholder="Notiz"></textarea>
+                <button type="submit" class="btn-success">Erinnerung hinzufügen</button>
+            </form>
+        </div>
+
+    <div id="sideMenu" class="side-menu">
+        <div class="side-menu-content">
+            <h2>Persönliche Daten</h2>
+            <form id="userProfileForm">
+                <input type="text" id="userNameInput" placeholder="Name" required>
+                <button type="submit" class="btn-success">Speichern</button>
+                <button type="button" onclick="resetUserProfile()" class="btn-danger">Zurücksetzen</button>
+                <button onclick="exportReminders()">Erinnerungen exportieren</button>
+                <input type="file" id="importFile" style="display:none" onchange="importReminders(event)">
+                <button onclick="document.getElementById('importFile').click()">Erinnerungen importieren</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+let reminders = [];
+let userProfile = {};
+
+const friendlyEmojis = ['😊', '👋', '🌟', '🎉', '👍', '🙌', '🤗', '😃', '😄', '😁'];
+
+function exportReminders() {
+    const dataStr = JSON.stringify(reminders);
+    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+
+    const exportFileDefaultName = 'reminders.json';
+
+    const linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', exportFileDefaultName);
+    linkElement.click();
+}
+
+function importReminders(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const contents = e.target.result;
+        const importedReminders = JSON.parse(contents);
+        reminders = importedReminders;
+        saveReminders();
+        displayReminders();
+        alert('Erinnerungen wurden erfolgreich importiert.');
+    };
+    reader.readAsText(file);
+}
+
+
+function saveReminders() {
+    localStorage.setItem('reminders', JSON.stringify(reminders));
+}
+
+function loadReminders() {
+    const savedReminders = localStorage.getItem('reminders');
+    if (savedReminders) {
+        reminders = JSON.parse(savedReminders);
+        displayReminders();
+    }
+}
+
+function saveUserProfile() {
+    localStorage.setItem('userProfile', JSON.stringify(userProfile));
+    updateAppTitle();
+}
+
+function loadUserProfile() {
+    const savedProfile = localStorage.getItem('userProfile');
+    if (savedProfile) {
+        userProfile = JSON.parse(savedProfile);
+        updateAppTitle();
+        setRandomEmoji();
+    }
+}
+
+function updateAppTitle() {
+    const userNameSpan = document.getElementById('userName');
+    userNameSpan.textContent = userProfile.name || '';
+}
+
+function setRandomEmoji() {
+    if (userProfile.name) {
+        const emojiSpan = document.getElementById('greetingEmoji');
+        const randomEmoji = friendlyEmojis[Math.floor(Math.random() * friendlyEmojis.length)];
+        emojiSpan.textContent = randomEmoji;
+    }
+}
+
+function displayReminders() {
+    const reminderList = document.getElementById('reminderList');
+    reminderList.innerHTML = '';
+    reminders.forEach((reminder, index) => {
+        const li = document.createElement('li');
+        li.innerHTML = `<span class="reminder-text">${reminder.text}</span>`;
+        li.onclick = () => deleteReminder(index);
+        reminderList.appendChild(li);
+    });
+}
+
+function showNewReminderForm() {
+    document.getElementById('mainView').classList.add('hidden');
+    document.getElementById('newReminderView').classList.remove('hidden');
+}
+
+function showMainView() {
+    document.getElementById('mainView').classList.remove('hidden');
+    document.getElementById('newReminderView').classList.add('hidden');
+    closeSideMenu();
+}
+
+function deleteReminder(index) {
+    if (confirm('Möchten Sie diese Erinnerung wirklich löschen?')) {
+        reminders.splice(index, 1);
+        saveReminders();
+        displayReminders();
+    }
+}
+
+function toggleSideMenu() {
+    const sideMenu = document.getElementById('sideMenu');
+    sideMenu.classList.toggle('open');
+    if (sideMenu.classList.contains('open')) {
+        document.getElementById('userNameInput').value = userProfile.name || '';
+    }
+}
+
+function closeSideMenu() {
+    const sideMenu = document.getElementById('sideMenu');
+    sideMenu.classList.remove('open');
+}
+
+function resetUserProfile() {
+    if (confirm('Möchten Sie Ihre persönlichen Daten wirklich zurücksetzen?')) {
+        userProfile = {};
+        saveUserProfile();
+        document.getElementById('userProfileForm').reset();
+        closeSideMenu();
+        updateAppTitle();
+        setRandomEmoji();
+    }
+}
+
+document.getElementById('reminderForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const newReminder = {
+        text: document.getElementById('reminderText').value,
+        note: document.getElementById('note').value
+    };
+    reminders.push(newReminder);
+    saveReminders();
+    this.reset();
+    showMainView();
+    displayReminders();
+});
+
+document.getElementById('userProfileForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    userProfile = {
+        name: document.getElementById('userNameInput').value
+    };
+    saveUserProfile();
+    closeSideMenu();
+    setRandomEmoji();
+});
+
+// Initialisierung
+window.addEventListener('load', function() {
+    loadReminders();
+    loadUserProfile();
+    setRandomEmoji();
+});
+
+// Event Listener für Klicks außerhalb des Seitenmenüs
+document.addEventListener('click', function(event) {
+    const sideMenu = document.getElementById('sideMenu');
+    const menuBtn = document.querySelector('.menu-btn');
+    if (!sideMenu.contains(event.target) && event.target !== menuBtn) {
+        closeSideMenu();
+    }
+});
+    </script>
+</body>
+</html>
