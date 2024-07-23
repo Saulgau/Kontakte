@@ -6,6 +6,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Telefonbuch App</title>
+    <link rel="apple-touch-icon" href="https://img.icons8.com/?size=256&id=11904&format=png">
+    <link rel="icon" href="https://img.icons8.com/?size=256&id=11904&format=png">
     <style>
         :root {
             --background: #121212;
@@ -33,88 +35,30 @@
         h1 {
             text-align: center;
             color: var(--primary);
+            margin-bottom: 20px;
         }
         
-        .group {
+        .search-bar {
             display: flex;
-            line-height: 28px;
-            align-items: center;
-            position: relative;
-            max-width: 100%;
             margin-bottom: 20px;
         }
         
-        .input {
-            width: 100%;
-            height: 40px;
-            line-height: 28px;
-            padding: 0 1rem;
-            padding-left: 2.5rem;
-            border: 2px solid transparent;
-            border-radius: 8px;
-            outline: none;
+        .search-bar input {
+            flex-grow: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 5px 0 0 5px;
             background-color: var(--surface);
             color: var(--on-surface);
-            transition: .3s ease;
         }
         
-        .input::placeholder {
-            color: #9e9ea7;
-        }
-        
-        .input:focus, .input:hover {
-            outline: none;
-            border-color: var(--secondary);
-            background-color: var(--surface);
-            box-shadow: 0 0 0 4px rgba(3, 218, 198, 0.1);
-        }
-        
-        .icon {
-            position: absolute;
-            left: 1rem;
-            fill: #9e9ea7;
-            width: 1rem;
-            height: 1rem;
-        }
-        
-        form {
-            background-color: var(--surface);
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 5px;
-            color: var(--on-surface);
-        }
-        
-        input[type="text"],
-        input[type="email"],
-        input[type="tel"],
-        textarea {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 10px;
-            border: 1px solid var(--primary);
-            border-radius: 4px;
-            background-color: var(--background);
-            color: var(--on-background);
-        }
-        
-        button {
+        .search-bar button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 0 5px 5px 0;
             background-color: var(--primary);
             color: var(--on-background);
-            border: none;
-            padding: 10px 20px;
-            border-radius: 4px;
             cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        
-        button:hover {
-            background-color: #9d4edd;
         }
         
         #contactList {
@@ -125,105 +69,178 @@
         #contactList li {
             background-color: var(--surface);
             margin-bottom: 10px;
-            padding: 10px;
-            border-radius: 4px;
-        }
-        
-        .contact-info {
-            margin-bottom: 5px;
+            padding: 15px;
+            border-radius: 5px;
+            cursor: pointer;
         }
         
         .contact-name {
             font-weight: bold;
             color: var(--secondary);
         }
+        
+        .new-contact-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin-top: 20px;
+            background-color: var(--primary);
+            color: var(--on-background);
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        
+        .back-btn {
+            background-color: var(--surface);
+            color: var(--on-surface);
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        #contactForm input, #contactForm textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: var(--surface);
+            color: var(--on-surface);
+        }
+        
+        #contactForm button {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--primary);
+            color: var(--on-background);
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        
+        #contactDetails {
+            background-color: var(--surface);
+            padding: 20px;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Telefonbuch App</h1>
-        
-        <div class="group">
-            <svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><g><path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"></path></g></svg>
-            <input id="searchInput" placeholder="Suche" type="search" class="input">
+        <div id="mainView">
+            <h1>Telefonbuch App</h1>
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="Suche Kontakte">
+                <button onclick="searchContacts()">Suchen</button>
+            </div>
+            <ul id="contactList"></ul>
+            <button class="new-contact-btn" onclick="showNewContactForm()">Neuer Kontakt</button>
         </div>
         
-        <form id="contactForm">
-            <label for="name">Name:</label>
-            <input type="text" id="name" required>
-            
-            <label for="phone">Telefonnummer:</label>
-            <input type="tel" id="phone" required>
-            
-            <label for="email">E-Mail:</label>
-            <input type="email" id="email">
-            
-            <label for="note">Notiz:</label>
-            <textarea id="note"></textarea>
-            
-            <button type="submit">Kontakt hinzufügen</button>
-        </form>
+        <div id="newContactView" class="hidden">
+            <button class="back-btn" onclick="showMainView()">Zurück</button>
+            <h2>Neuer Kontakt</h2>
+            <form id="contactForm">
+                <input type="text" id="name" placeholder="Name" required>
+                <input type="tel" id="phone" placeholder="Telefonnummer" required>
+                <input type="email" id="email" placeholder="E-Mail">
+                <textarea id="note" placeholder="Notiz"></textarea>
+                <button type="submit">Kontakt hinzufügen</button>
+            </form>
+        </div>
         
-        <ul id="contactList"></ul>
+        <div id="contactDetailView" class="hidden">
+            <button class="back-btn" onclick="showMainView()">Zurück</button>
+            <div id="contactDetails"></div>
+        </div>
     </div>
 
     <script>
-        // Funktion zum Speichern der Kontakte in Cookies
-        function saveContacts(contacts) {
+        let contacts = [];
+
+        function saveContacts() {
             localStorage.setItem('contacts', JSON.stringify(contacts));
         }
 
-        // Funktion zum Laden der Kontakte aus Cookies
         function loadContacts() {
-            const contactsJson = localStorage.getItem('contacts');
-            return contactsJson ? JSON.parse(contactsJson) : [];
+            const savedContacts = localStorage.getItem('contacts');
+            if (savedContacts) {
+                contacts = JSON.parse(savedContacts);
+                displayContacts(contacts);
+            }
         }
 
-        // Funktion zum Anzeigen der Kontakte
-        function displayContacts(contacts) {
+        function displayContacts(contactsToShow) {
             const contactList = document.getElementById('contactList');
             contactList.innerHTML = '';
-            contacts.forEach((contact, index) => {
+            contactsToShow.sort((a, b) => a.name.localeCompare(b.name)).forEach((contact, index) => {
                 const li = document.createElement('li');
-                li.innerHTML = `
-                    <div class="contact-info"><span class="contact-name">${contact.name}</span></div>
-                    <div class="contact-info">Tel: ${contact.phone}</div>
-                    <div class="contact-info">E-Mail: ${contact.email}</div>
-                    <div class="contact-info">Notiz: ${contact.note}</div>
-                `;
+                li.innerHTML = `<span class="contact-name">${contact.name}</span>`;
+                li.onclick = () => showContactDetails(index);
                 contactList.appendChild(li);
             });
         }
 
-        // Kontakte laden und anzeigen
-        let contacts = loadContacts();
-        displayContacts(contacts);
-
-        // Event Listener für das Formular
-        document.getElementById('contactForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const name = document.getElementById('name').value;
-            const phone = document.getElementById('phone').value;
-            const email = document.getElementById('email').value;
-            const note = document.getElementById('note').value;
-
-            contacts.push({name, phone, email, note});
-            saveContacts(contacts);
-            displayContacts(contacts);
-
-            // Formular zurücksetzen
-            this.reset();
-        });
-
-        // Event Listener für die Suche
-        document.getElementById('searchInput').addEventListener('input', function(e) {
-            const searchTerm = e.target.value.toLowerCase();
+        function searchContacts() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
             const filteredContacts = contacts.filter(contact => 
                 contact.name.toLowerCase().includes(searchTerm) || 
                 contact.email.toLowerCase().includes(searchTerm)
             );
             displayContacts(filteredContacts);
+        }
+
+        function showNewContactForm() {
+            document.getElementById('mainView').classList.add('hidden');
+            document.getElementById('newContactView').classList.remove('hidden');
+        }
+
+        function showMainView() {
+            document.getElementById('mainView').classList.remove('hidden');
+            document.getElementById('newContactView').classList.add('hidden');
+            document.getElementById('contactDetailView').classList.add('hidden');
+            displayContacts(contacts);
+        }
+
+        function showContactDetails(index) {
+            const contact = contacts[index];
+            const detailsDiv = document.getElementById('contactDetails');
+            detailsDiv.innerHTML = `
+                <h2>${contact.name}</h2>
+                <p>Telefon: ${contact.phone}</p>
+                <p>E-Mail: ${contact.email}</p>
+                <p>Notiz: ${contact.note}</p>
+            `;
+            document.getElementById('mainView').classList.add('hidden');
+            document.getElementById('contactDetailView').classList.remove('hidden');
+        }
+
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const newContact = {
+                name: document.getElementById('name').value,
+                phone: document.getElementById('phone').value,
+                email: document.getElementById('email').value,
+                note: document.getElementById('note').value
+            };
+            contacts.push(newContact);
+            saveContacts();
+            this.reset();
+            showMainView();
         });
+
+        document.getElementById('searchInput').addEventListener('input', searchContacts);
+
+        loadContacts();
     </script>
 </body>
 </html>
