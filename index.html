@@ -242,27 +242,22 @@ input, textarea {
             </form>
         </div>
         
-        <div id="contactDetailView" class="hidden">
-            <button class="back-btn" onclick="showMainView()">Zurück</button>
-            <div id="contactDetails"></div>
-            <div class="contact-actions">
-                <button onclick="editContact()" class="btn-success">Bearbeiten</button>
-                <button onclick="deleteContact()" class="btn-danger">Löschen</button>
-            </div>
-        </div>
+<div id="contactDetailView" class="hidden">
+    <button class="back-btn" onclick="showMainView()">Zurück</button>
+    <div id="contactDetails"></div>
+</div>
         
-        <div id="editContactView" class="hidden">
-            <button class="back-btn" onclick="showContactDetails()">Zurück</button>
-            <h2>Kontakt bearbeiten</h2>
-            <form id="editContactForm">
-                <input type="text" id="editName" placeholder="Name" required>
-                <input type="tel" id="editPhone" placeholder="Telefonnummer" required>
-                <input type="email" id="editEmail" placeholder="E-Mail">
-                <textarea id="editNote" placeholder="Notiz"></textarea>
-                <button type="submit" class="btn-success">Speichern</button>
-            </form>
-        </div>
-    </div>
+<div id="editContactView" class="hidden">
+    <button class="back-btn" onclick="showContactDetails(currentContactIndex)">Zurück</button>
+    <h2>Kontakt bearbeiten</h2>
+    <form id="editContactForm">
+        <input type="text" id="editName" placeholder="Name" required>
+        <input type="tel" id="editPhone" placeholder="Telefonnummer" required>
+        <input type="email" id="editEmail" placeholder="E-Mail">
+        <textarea id="editNote" placeholder="Notiz"></textarea>
+        <button type="submit" class="btn-success">Speichern</button>
+    </form>
+</div>
 
     <div id="sideMenu" class="side-menu">
         <div class="side-menu-content">
@@ -375,6 +370,7 @@ function showContactDetails(index) {
         </div>
     `;
     document.getElementById('mainView').classList.add('hidden');
+    document.getElementById('editContactView').classList.add('hidden');
     document.getElementById('contactDetailView').classList.remove('hidden');
 }
 
@@ -442,6 +438,7 @@ document.getElementById('contactForm').addEventListener('submit', function(e) {
     this.reset();
     showMainView();
 });
+
 
 document.getElementById('editContactForm').addEventListener('submit', function(e) {
     e.preventDefault();
