@@ -268,6 +268,9 @@ input, textarea {
                 <input type="email" id="userEmail" placeholder="E-Mail" required>
                 <button type="submit" class="btn-success">Speichern</button>
                 <button type="button" onclick="resetUserProfile()" class="btn-danger">Zurücksetzen</button>
+                <button onclick="exportContacts()">Kontakte exportieren</button>
+                <input type="file" id="importFile" style="display:none" onchange="importContacts(event)">
+                <button onclick="document.getElementById('importFile').click()">Kontakte importieren</button>
             </form>
         </div>
     </div>
@@ -279,6 +282,42 @@ let currentContactIndex = -1;
 let userProfile = {};
 
 const friendlyEmojis = ['😊', '👋', '🌟', '🎉', '👍', '🙌', '🤗', '😃', '😄', '😁'];
+
+function exportContacts() {
+    const dataStr = JSON.stringify(contacts);
+    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+
+    const exportFileDefaultName = 'contacts.json';
+
+    const linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', exportFileDefaultName);
+    linkElement.click();
+}
+
+function importContacts(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const contents = e.target.result;
+        const importedContacts = JSON.parse(contents);
+
+        // Füge die importierten Kontakte hinzu, ohne Duplikate zu erstellen
+        importedContacts.forEach(importedContact => {
+            if (!contacts.some(contact => contact.name === importedContact.name && contact.phone === importedContact.phone)) {
+                contacts.push(importedContact);
+            }
+        });
+
+        saveContacts();
+        displayContacts(contacts);
+        alert('Kontakte wurden erfolgreich importiert.');
+    };
+    reader.readAsText(file);
+}
+
 
 function saveContacts() {
     localStorage.setItem('contacts', JSON.stringify(contacts));
