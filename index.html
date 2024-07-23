@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Telefonbuch</title>
+    <title>Telefonbuch App</title>
     <link rel="apple-touch-icon" href="https://img.icons8.com/?size=256&id=11904&format=png">
     <link rel="icon" href="https://img.icons8.com/?size=256&id=11904&format=png">
     <style>
@@ -16,6 +16,8 @@
             --secondary: #03dac6;
             --on-background: #ffffff;
             --on-surface: #ffffff;
+            --danger: #cf6679;
+            --success: #03dac6;
         }
         
         body {
@@ -38,26 +40,49 @@
             margin-bottom: 20px;
         }
         
-        .search-bar {
+        .header {
             display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 20px;
         }
         
+        .menu-btn {
+            background: none;
+            border: none;
+            color: var(--on-background);
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        .search-bar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background-color: var(--background);
+            padding: 10px 0;
+        }
+        
         .search-bar input {
-            flex-grow: 1;
+            width: 100%;
             padding: 10px;
             border: none;
-            border-radius: 5px 0 0 5px;
+            border-radius: 5px;
             background-color: var(--surface);
             color: var(--on-surface);
         }
         
-        .search-bar button {
-            padding: 10px 15px;
-            border: none;
-            border-radius: 0 5px 5px 0;
+        .new-contact-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin-top: 10px;
+            margin-bottom: 20px;
             background-color: var(--primary);
             color: var(--on-background);
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
             cursor: pointer;
         }
         
@@ -79,19 +104,6 @@
             color: var(--secondary);
         }
         
-        .new-contact-btn {
-            display: block;
-            width: 100%;
-            padding: 15px;
-            margin-top: 20px;
-            background-color: var(--primary);
-            color: var(--on-background);
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        
         .back-btn {
             background-color: var(--surface);
             color: var(--on-surface);
@@ -106,7 +118,7 @@
             display: none;
         }
         
-        #contactForm input, #contactForm textarea {
+        #contactForm input, #contactForm textarea, #userProfileForm input {
             width: 100%;
             padding: 10px;
             margin-bottom: 10px;
@@ -116,15 +128,24 @@
             color: var(--on-surface);
         }
         
-        #contactForm button {
+        #contactForm button, #userProfileForm button {
             width: 100%;
             padding: 15px;
-            background-color: var(--primary);
-            color: var(--on-background);
+            margin-top: 10px;
             border: none;
             border-radius: 5px;
             font-size: 16px;
             cursor: pointer;
+        }
+        
+        .btn-success {
+            background-color: var(--success);
+            color: var(--on-background);
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+            color: var(--on-background);
         }
         
         #contactDetails {
@@ -132,18 +153,52 @@
             padding: 20px;
             border-radius: 5px;
         }
+        
+        .contact-action {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            background-color: var(--primary);
+            color: var(--on-background);
+            text-align: center;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        
+        #userProfileModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: var(--surface);
+            padding: 20px;
+            border-radius: 5px;
+            width: 80%;
+            max-width: 400px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div id="mainView">
-            <h1>Hallo Jule</h1>
+            <div class="header">
+                <h1 id="appTitle">Telefonbuch App</h1>
+                <button class="menu-btn" onclick="showUserProfileModal()">☰</button>
+            </div>
             <div class="search-bar">
                 <input type="text" id="searchInput" placeholder="Suche Kontakte">
-                <button onclick="searchContacts()">Suchen</button>
             </div>
-            <ul id="contactList"></ul>
             <button class="new-contact-btn" onclick="showNewContactForm()">Neuer Kontakt</button>
+            <ul id="contactList"></ul>
         </div>
         
         <div id="newContactView" class="hidden">
@@ -154,18 +209,48 @@
                 <input type="tel" id="phone" placeholder="Telefonnummer" required>
                 <input type="email" id="email" placeholder="E-Mail">
                 <textarea id="note" placeholder="Notiz"></textarea>
-                <button type="submit">Kontakt hinzufügen</button>
+                <button type="submit" class="btn-success">Kontakt hinzufügen</button>
             </form>
         </div>
         
         <div id="contactDetailView" class="hidden">
             <button class="back-btn" onclick="showMainView()">Zurück</button>
             <div id="contactDetails"></div>
+            <button onclick="editContact()" class="btn-success">Bearbeiten</button>
+            <button onclick="deleteContact()" class="btn-danger">Löschen</button>
+        </div>
+        
+        <div id="editContactView" class="hidden">
+            <button class="back-btn" onclick="showContactDetails()">Zurück</button>
+            <h2>Kontakt bearbeiten</h2>
+            <form id="editContactForm">
+                <input type="text" id="editName" placeholder="Name" required>
+                <input type="tel" id="editPhone" placeholder="Telefonnummer" required>
+                <input type="email" id="editEmail" placeholder="E-Mail">
+                <textarea id="editNote" placeholder="Notiz"></textarea>
+                <button type="submit" class="btn-success">Speichern</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="userProfileModal" class="hidden">
+        <div class="modal-content">
+            <h2>Persönliche Daten</h2>
+            <form id="userProfileForm">
+                <input type="text" id="userName" placeholder="Name" required>
+                <input type="tel" id="userPhone" placeholder="Telefonnummer" required>
+                <input type="email" id="userEmail" placeholder="E-Mail" required>
+                <button type="submit" class="btn-success">Speichern</button>
+                <button type="button" onclick="resetUserProfile()" class="btn-danger">Zurücksetzen</button>
+            </form>
         </div>
     </div>
 
     <script>
         let contacts = [];
+        let lastSearchTerm = '';
+        let currentContactIndex = -1;
+        let userProfile = {};
 
         function saveContacts() {
             localStorage.setItem('contacts', JSON.stringify(contacts));
@@ -177,6 +262,24 @@
                 contacts = JSON.parse(savedContacts);
                 displayContacts(contacts);
             }
+        }
+
+        function saveUserProfile() {
+            localStorage.setItem('userProfile', JSON.stringify(userProfile));
+            updateAppTitle();
+        }
+
+        function loadUserProfile() {
+            const savedProfile = localStorage.getItem('userProfile');
+            if (savedProfile) {
+                userProfile = JSON.parse(savedProfile);
+                updateAppTitle();
+            }
+        }
+
+        function updateAppTitle() {
+            const appTitle = document.getElementById('appTitle');
+            appTitle.textContent = userProfile.name ? `Hallo ${userProfile.name}` : 'Telefonbuch App';
         }
 
         function displayContacts(contactsToShow) {
@@ -192,9 +295,10 @@
 
         function searchContacts() {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            lastSearchTerm = searchTerm;
             const filteredContacts = contacts.filter(contact => 
-                contact.name.toLowerCase().includes(searchTerm) || 
-                contact.email.toLowerCase().includes(searchTerm)
+                contact.name.toLowerCase().startsWith(searchTerm) || 
+                contact.name.toLowerCase().includes(' ' + searchTerm)
             );
             displayContacts(filteredContacts);
         }
@@ -208,27 +312,72 @@
             document.getElementById('mainView').classList.remove('hidden');
             document.getElementById('newContactView').classList.add('hidden');
             document.getElementById('contactDetailView').classList.add('hidden');
-            displayContacts(contacts);
+            document.getElementById('editContactView').classList.add('hidden');
+            document.getElementById('searchInput').value = lastSearchTerm;
+            searchContacts();
         }
 
         function showContactDetails(index) {
+            currentContactIndex = index;
             const contact = contacts[index];
             const detailsDiv = document.getElementById('contactDetails');
             detailsDiv.innerHTML = `
                 <h2>${contact.name}</h2>
-                <p>Telefon: ${contact.phone}</p>
-                <p>E-Mail: ${contact.email}</p>
-                <p>Notiz: ${contact.note}</p>
+                <a href="tel:${contact.phone}" class="contact-action">Anrufen: ${contact.phone}</a>
+                <a href="mailto:${contact.email}" class="contact-action">E-Mail: ${contact.email}</a>
+                ${contact.note ? `<p>Notiz: ${contact.note}</p>` : ''}
             `;
             document.getElementById('mainView').classList.add('hidden');
             document.getElementById('contactDetailView').classList.remove('hidden');
+        }
+
+        function editContact() {
+            const contact = contacts[currentContactIndex];
+            document.getElementById('editName').value = contact.name;
+            document.getElementById('editPhone').value = contact.phone;
+            document.getElementById('editEmail').value = contact.email;
+            document.getElementById('editNote').value = contact.note;
+            document.getElementById('contactDetailView').classList.add('hidden');
+            document.getElementById('editContactView').classList.remove('hidden');
+        }
+
+        function deleteContact() {
+            if (confirm('Möchten Sie diesen Kontakt wirklich löschen?')) {
+                contacts.splice(currentContactIndex, 1);
+                saveContacts();
+                showMainView();
+            }
+        }
+
+        function formatPhoneNumber(phone) {
+            if (phone.startsWith('+49')) {
+                return '0' + phone.slice(3);
+            }
+            return phone;
+        }
+
+        function showUserProfileModal() {
+            document.getElementById('userName').value = userProfile.name || '';
+            document.getElementById('userPhone').value = userProfile.phone || '';
+            document.getElementById('userEmail').value = userProfile.email || '';
+            document.getElementById('userProfileModal').classList.remove('hidden');
+        }
+
+        function resetUserProfile() {
+            if (confirm('Möchten Sie Ihre persönlichen Daten wirklich zurücksetzen?')) {
+                userProfile = {};
+                saveUserProfile();
+                document.getElementById('userProfileForm').reset();
+                document.getElementById('userProfileModal').classList.add('hidden');
+                location.reload();
+            }
         }
 
         document.getElementById('contactForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const newContact = {
                 name: document.getElementById('name').value,
-                phone: document.getElementById('phone').value,
+                phone: formatPhoneNumber(document.getElementById('phone').value),
                 email: document.getElementById('email').value,
                 note: document.getElementById('note').value
             };
@@ -238,9 +387,34 @@
             showMainView();
         });
 
+        document.getElementById('editContactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            contacts[currentContactIndex] = {
+                name: document.getElementById('editName').value,
+                phone: formatPhoneNumber(document.getElementById('editPhone').value),
+                email: document.getElementById('editEmail').value,
+                note: document.getElementById('editNote').value
+            };
+            saveContacts();
+            showContactDetails(currentContactIndex);
+        });
+
+        document.getElementById('userProfileForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            userProfile = {
+                name: document.getElementById('userName').value,
+                phone: formatPhoneNumber(document.getElementById('userPhone').value),
+                email: document.getElementById('userEmail').value
+            };
+            saveUserProfile();
+            document.getElementById('userProfileModal').classList.add('hidden');
+            location.reload();
+        });
+
         document.getElementById('searchInput').addEventListener('input', searchContacts);
 
         loadContacts();
+        loadUserProfile();
     </script>
 </body>
 </html>
