@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Telefonbuch App</title>
+    <style>
+        :root {
+            --background: #121212;
+            --surface: #1e1e1e;
+            --primary: #bb86fc;
+            --secondary: #03dac6;
+            --on-background: #ffffff;
+            --on-surface: #ffffff;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background);
+            color: var(--on-background);
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: var(--primary);
+        }
+        
+        .group {
+            display: flex;
+            line-height: 28px;
+            align-items: center;
+            position: relative;
+            max-width: 100%;
+            margin-bottom: 20px;
+        }
+        
+        .input {
+            width: 100%;
+            height: 40px;
+            line-height: 28px;
+            padding: 0 1rem;
+            padding-left: 2.5rem;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            outline: none;
+            background-color: var(--surface);
+            color: var(--on-surface);
+            transition: .3s ease;
+        }
+        
+        .input::placeholder {
+            color: #9e9ea7;
+        }
+        
+        .input:focus, .input:hover {
+            outline: none;
+            border-color: var(--secondary);
+            background-color: var(--surface);
+            box-shadow: 0 0 0 4px rgba(3, 218, 198, 0.1);
+        }
+        
+        .icon {
+            position: absolute;
+            left: 1rem;
+            fill: #9e9ea7;
+            width: 1rem;
+            height: 1rem;
+        }
+        
+        form {
+            background-color: var(--surface);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--on-surface);
+        }
+        
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        textarea {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid var(--primary);
+            border-radius: 4px;
+            background-color: var(--background);
+            color: var(--on-background);
+        }
+        
+        button {
+            background-color: var(--primary);
+            color: var(--on-background);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #9d4edd;
+        }
+        
+        #contactList {
+            list-style-type: none;
+            padding: 0;
+        }
+        
+        #contactList li {
+            background-color: var(--surface);
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        
+        .contact-info {
+            margin-bottom: 5px;
+        }
+        
+        .contact-name {
+            font-weight: bold;
+            color: var(--secondary);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Telefonbuch App</h1>
+        
+        <div class="group">
+            <svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><g><path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"></path></g></svg>
+            <input id="searchInput" placeholder="Suche" type="search" class="input">
+        </div>
+        
+        <form id="contactForm">
+            <label for="name">Name:</label>
+            <input type="text" id="name" required>
+            
+            <label for="phone">Telefonnummer:</label>
+            <input type="tel" id="phone" required>
+            
+            <label for="email">E-Mail:</label>
+            <input type="email" id="email">
+            
+            <label for="note">Notiz:</label>
+            <textarea id="note"></textarea>
+            
+            <button type="submit">Kontakt hinzufügen</button>
+        </form>
+        
+        <ul id="contactList"></ul>
+    </div>
+
+    <script>
+        // Funktion zum Speichern der Kontakte in Cookies
+        function saveContacts(contacts) {
+            localStorage.setItem('contacts', JSON.stringify(contacts));
+        }
+
+        // Funktion zum Laden der Kontakte aus Cookies
+        function loadContacts() {
+            const contactsJson = localStorage.getItem('contacts');
+            return contactsJson ? JSON.parse(contactsJson) : [];
+        }
+
+        // Funktion zum Anzeigen der Kontakte
+        function displayContacts(contacts) {
+            const contactList = document.getElementById('contactList');
+            contactList.innerHTML = '';
+            contacts.forEach((contact, index) => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <div class="contact-info"><span class="contact-name">${contact.name}</span></div>
+                    <div class="contact-info">Tel: ${contact.phone}</div>
+                    <div class="contact-info">E-Mail: ${contact.email}</div>
+                    <div class="contact-info">Notiz: ${contact.note}</div>
+                `;
+                contactList.appendChild(li);
+            });
+        }
+
+        // Kontakte laden und anzeigen
+        let contacts = loadContacts();
+        displayContacts(contacts);
+
+        // Event Listener für das Formular
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('name').value;
+            const phone = document.getElementById('phone').value;
+            const email = document.getElementById('email').value;
+            const note = document.getElementById('note').value;
+
+            contacts.push({name, phone, email, note});
+            saveContacts(contacts);
+            displayContacts(contacts);
+
+            // Formular zurücksetzen
+            this.reset();
+        });
+
+        // Event Listener für die Suche
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const filteredContacts = contacts.filter(contact => 
+                contact.name.toLowerCase().includes(searchTerm) || 
+                contact.email.toLowerCase().includes(searchTerm)
+            );
+            displayContacts(filteredContacts);
+        });
+    </script>
+</body>
+</html>
