@@ -1,533 +1,476 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Telefonbuch App</title>
-    <link rel="apple-touch-icon" href="https://img.icons8.com/?size=256&id=11904&format=png">
-    <link rel="icon" href="https://img.icons8.com/?size=256&id=11904&format=png">
-    <style>
-        :root {
-            --background: #121212;
-            --surface: #1e1e1e;
-            --primary: #bb86fc;
-            --secondary: #03dac6;
-            --on-background: #ffffff;
-            --on-surface: #ffffff;
-            --danger: #cf6679;
-            --success: #03dac6;
-            --toast-bg: rgba(0, 0, 0, 0.8);
-        }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: var(--background);
-            color: var(--on-background);
-        }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        .greeting {
-            display: flex;
-            align-items: center;
-        }
-        #greetingEmoji {
-            font-size: 24px;
-            margin-right: 10px;
-        }
-        h1, h2 {
-            color: var(--primary);
-            margin: 0;
-        }
-        .menu-btn {
-            background: none;
-            border: none;
-            color: var(--on-background);
-            font-size: 24px;
-            cursor: pointer;
-            padding: 0;
-        }
-        .search-bar {
-            display: flex;
-            margin-bottom: 20px;
-            height: 40px;
-        }
-        .search-bar input {
-            flex-grow: 1;
-            padding: 0 10px;
-            border: none;
-            border-radius: 5px 0 0 5px;
-            background-color: var(--surface);
-            color: var(--on-surface);
-            height: 100%;
-            transition: background-color 0.3s;
-        }
-        .search-bar input:focus {
-            background-color: #2a2a2a;
-            outline: none;
-        }
-        .search-bar button {
-            padding: 0 15px;
-            border: none;
-            border-radius: 0 5px 5px 0;
-            background-color: var(--primary);
-            color: var(--on-background);
-            cursor: pointer;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background-color 0.3s;
-        }
-        .search-bar button:hover {
-            background-color: #a371e8;
-        }
-        .new-contact-btn, .back-btn, #contactForm button, #editContactForm button, #userProfileForm button {
-            display: block;
-            width: 100%;
-            padding: 15px;
-            margin-top: 10px;
-            margin-bottom: 20px;
-            background-color: var(--primary);
-            color: var(--on-background);
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        .new-contact-btn:hover, .back-btn:hover, #contactForm button:hover, #editContactForm button:hover, #userProfileForm button:hover {
-            background-color: #a371e8;
-        }
-        #contactList {
-            list-style-type: none;
-            padding: 0;
-        }
-        #contactList li {
-            background-color: var(--surface);
-            margin-bottom: 10px;
-            padding: 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s, transform 0.2s;
-        }
-        #contactList li:hover {
-            background-color: #2a2a2a;
-            transform: scale(1.02);
-        }
-        .contact-name {
-            font-weight: bold;
-            color: var(--secondary);
-        }
-        .hidden {
-            display: none;
-        }
-        input, textarea {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border: none;
-            border-radius: 5px;
-            background-color: var(--surface);
-            color: var(--on-surface);
-            box-sizing: border-box;
-            transition: background-color 0.3s;
-        }
-        input:focus, textarea:focus {
-            background-color: #2a2a2a;
-            outline: none;
-        }
-        .contact-actions {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-        }
-        .contact-actions button {
-            width: 48%;
-            padding: 15px;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-            color: var(--on-background);
-            transition: background-color 0.3s;
-        }
-        .contact-actions .btn-success {
-            background-color: var(--success);
-        }
-        .contact-actions .btn-success:hover {
-            background-color: #02b1a8;
-        }
-        .contact-actions .btn-danger {
-            background-color: var(--danger);
-        }
-        .contact-actions .btn-danger:hover {
-            background-color: #b85b68;
-        }
-        #contactDetails {
-            background-color: var(--surface);
-            padding: 20px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-        }
-        .contact-action {
-            display: block;
-            width: calc(100% - 40px);
-            padding: 10px;
-            margin: 10px 20px;
-            background-color: var(--primary);
-            color: var(--on-background);
-            text-align: center;
-            text-decoration: none;
-            border-radius: 5px;
-            transition: background-color 0.3s;
-        }
-        .contact-action:hover {
-            background-color: #a371e8;
-        }
-        .side-menu {
-            position: fixed;
-            top: 0;
-            right: -300px;
-            width: 300px;
-            height: 100%;
-            background-color: var(--surface);
-            transition: right 0.3s ease-in-out;
-            z-index: 1000;
-            overflow-y: auto;
-            box-shadow: -2px 0 5px rgba(0,0,0,0.5);
-        }
-        .side-menu.open {
-            right: 0;
-        }
-        .side-menu-content {
-            padding: 20px;
-        }
-        @media (max-width: 600px) {
-            .side-menu {
-                width: 100%;
-                right: -100%;
-            }
-        }
-        /* Toast-Nachricht */
-        #toast {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: var(--toast-bg);
-            color: var(--on-background);
-            padding: 10px 20px;
-            border-radius: 5px;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.5s;
-            z-index: 2000;
-        }
-        #toast.show {
-            opacity: 1;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kontakte</title>
+  <style>
+    /* Basis-Styling à la Apple */
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f2f2f2;
+      color: #333;
+    }
+    header {
+      background-color: #fff;
+      padding: 10px 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    header h1 {
+      font-size: 24px;
+      margin: 0;
+    }
+    header button {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      margin-left: 10px;
+    }
+    .search-bar {
+      padding: 10px 20px;
+      background-color: #fff;
+      border-bottom: 1px solid #ddd;
+    }
+    .search-bar input {
+      width: 100%;
+      padding: 8px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .container {
+      display: flex;
+      height: calc(100vh - 120px);
+    }
+    .sidebar {
+      width: 300px;
+      background-color: #fff;
+      border-right: 1px solid #ddd;
+      overflow-y: auto;
+    }
+    .content {
+      flex-grow: 1;
+      padding: 20px;
+      overflow-y: auto;
+      background-color: #fff;
+    }
+    .contact-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .contact-list li {
+      padding: 15px 20px;
+      border-bottom: 1px solid #eee;
+      cursor: pointer;
+    }
+    .contact-list li:hover {
+      background-color: #f9f9f9;
+    }
+    .contact-list li.active {
+      background-color: #e6f7ff;
+    }
+    /* Detailansicht */
+    .detail-view img {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 15px;
+    }
+    .detail-view h2 {
+      margin-top: 0;
+    }
+    .detail-field {
+      margin-bottom: 10px;
+    }
+    .detail-field strong {
+      display: inline-block;
+      width: 100px;
+    }
+    .action-buttons {
+      margin-top: 20px;
+    }
+    .action-buttons button {
+      padding: 10px 15px;
+      margin-right: 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .btn-edit { background-color: #007aff; color: #fff; }
+    .btn-delete { background-color: #ff3b30; color: #fff; }
+    .btn-add    { background-color: #34c759; color: #fff; }
+    .btn-export, .btn-import { background-color: #8e8e93; color: #fff; }
+    .hidden { display: none; }
+
+    /* Modal für Hinzufügen/Bearbeiten */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .modal-content {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 600px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-header h2 {
+      margin: 0;
+    }
+    .modal-header button {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+    }
+    .modal-body {
+      margin-top: 20px;
+    }
+    .modal-body label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    .modal-body input,
+    .modal-body textarea {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    .modal-footer {
+      text-align: right;
+    }
+    .modal-footer button {
+      padding: 10px 15px;
+      margin-left: 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .btn-save { background-color: #007aff; color: #fff; }
+    .btn-cancel { background-color: #8e8e93; color: #fff; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+        height: auto;
+      }
+      .sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid #ddd;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div id="mainView">
-            <div class="header">
-                <div class="greeting">
-                    <span id="greetingEmoji"></span>
-                    <h1>Hallo <span id="userName"></span></h1>
-                </div>
-                <button class="menu-btn" onclick="toggleSideMenu()">☰</button>
-            </div>
-            <div class="search-bar">
-                <input type="text" id="searchInput" placeholder="Suche Kontakte">
-                <button onclick="searchContacts()">Suchen</button>
-            </div>
-            <button class="new-contact-btn" onclick="showNewContactForm()">Neuer Kontakt</button>
-            <ul id="contactList"></ul>
-        </div>
-        
-        <div id="newContactView" class="hidden">
-            <button class="back-btn" onclick="showMainView()">Zurück</button>
-            <h2>Neuer Kontakt</h2>
-            <form id="contactForm">
-                <input type="text" id="name" placeholder="Name" required>
-                <input type="tel" id="phone" placeholder="Telefonnummer" required>
-                <input type="email" id="email" placeholder="E-Mail">
-                <textarea id="note" placeholder="Notiz"></textarea>
-                <button type="submit" class="btn-success">Kontakt hinzufügen</button>
-            </form>
-        </div>
-        
-        <div id="contactDetailView" class="hidden">
-            <button class="back-btn" onclick="showMainView()">Zurück</button>
-            <div id="contactDetails"></div>
-        </div>
-        
-        <div id="editContactView" class="hidden">
-            <button class="back-btn" onclick="showContactDetails(currentContactIndex)">Zurück</button>
-            <h2>Kontakt bearbeiten</h2>
-            <form id="editContactForm">
-                <input type="text" id="editName" placeholder="Name" required>
-                <input type="tel" id="editPhone" placeholder="Telefonnummer" required>
-                <input type="email" id="editEmail" placeholder="E-Mail">
-                <textarea id="editNote" placeholder="Notiz"></textarea>
-                <button type="submit" class="btn-success">Speichern</button>
-            </form>
-        </div>
-        
-        <div id="sideMenu" class="side-menu">
-            <div class="side-menu-content">
-                <h2>Persönliche Daten</h2>
-                <form id="userProfileForm">
-                    <input type="text" id="userNameInput" placeholder="Name" required>
-                    <input type="tel" id="userPhone" placeholder="Telefonnummer" required>
-                    <input type="email" id="userEmail" placeholder="E-Mail" required>
-                    <button type="submit" class="btn-success">Speichern</button>
-                    <button type="button" onclick="resetUserProfile()" class="btn-danger">Zurücksetzen</button>
-                    <button type="button" onclick="exportContacts()">Kontakte exportieren</button>
-                    <input type="file" id="importFile" style="display:none" onchange="importContacts(event)">
-                    <button type="button" onclick="document.getElementById('importFile').click()">Kontakte importieren</button>
-                </form>
-            </div>
-        </div>
+  <header>
+    <h1>Kontakte</h1>
+    <div>
+      <button onclick="openAddModal()" title="Neuer Kontakt">＋</button>
+      <button onclick="exportContacts()" class="btn-export" title="Exportieren">⇩</button>
+      <button onclick="document.getElementById('importFile').click()" class="btn-import" title="Importieren">⇧</button>
+      <input type="file" id="importFile" class="hidden" onchange="importContacts(event)">
     </div>
-    <div id="toast"></div>
-    <script>
-        let contacts = [];
-        let lastSearchTerm = '';
-        let currentContactIndex = -1;
-        let userProfile = {};
+  </header>
+  <div class="search-bar">
+    <input type="text" id="searchInput" placeholder="Suche Kontakte" oninput="searchContacts()">
+  </div>
+  <div class="container">
+    <div class="sidebar">
+      <ul id="contactList" class="contact-list">
+        <!-- Kontaktliste -->
+      </ul>
+    </div>
+    <div class="content">
+      <div id="detailView" class="detail-view">
+        <p>Wähle einen Kontakt aus der Liste, um die Details anzuzeigen.</p>
+      </div>
+    </div>
+  </div>
 
-        const friendlyEmojis = ['😊', '👋', '🌟', '🎉', '👍', '🙌', '🤗', '😃', '😄', '😁'];
+  <!-- Modal für Hinzufügen/Bearbeiten -->
+  <div id="contactModal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modalTitle">Neuer Kontakt</h2>
+        <button onclick="closeModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <form id="contactForm">
+          <input type="hidden" id="contactId">
+          <label for="firstName">Vorname</label>
+          <input type="text" id="firstName" required>
+          <label for="lastName">Nachname</label>
+          <input type="text" id="lastName" required>
+          <label for="company">Firma</label>
+          <input type="text" id="company">
+          <label for="title">Position</label>
+          <input type="text" id="title">
+          <label for="phone">Telefon</label>
+          <input type="tel" id="phone">
+          <label for="mobile">Mobil</label>
+          <input type="tel" id="mobile">
+          <label for="email">E-Mail</label>
+          <input type="email" id="email">
+          <label for="street">Straße</label>
+          <input type="text" id="street">
+          <label for="postalCode">PLZ</label>
+          <input type="text" id="postalCode">
+          <label for="city">Stadt</label>
+          <input type="text" id="city">
+          <label for="country">Land</label>
+          <input type="text" id="country">
+          <label for="birthday">Geburtstag</label>
+          <input type="date" id="birthday">
+          <label for="url">Website</label>
+          <input type="url" id="url">
+          <label for="note">Notizen</label>
+          <textarea id="note" rows="3"></textarea>
+          <label for="image">Foto (Bild-URL)</label>
+          <input type="url" id="image" placeholder="https://">
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" onclick="closeModal()">Abbrechen</button>
+        <button class="btn-save" onclick="saveContact()">Speichern</button>
+      </div>
+    </div>
+  </div>
 
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.classList.add('show');
-            setTimeout(() => { toast.classList.remove('show'); }, 2000);
-        }
+  <script>
+    let contacts = [];
+    let selectedContactId = null;
 
-        // Export- und Importfunktionen bleiben unverändert
-        function exportContacts() {
-            const dataStr = JSON.stringify(contacts);
-            const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
-            const exportFileDefaultName = 'contacts.json';
-            const linkElement = document.createElement('a');
-            linkElement.setAttribute('href', dataUri);
-            linkElement.setAttribute('download', exportFileDefaultName);
-            linkElement.click();
-        }
-        function importContacts(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const contents = e.target.result;
-                const importedContacts = JSON.parse(contents);
-                importedContacts.forEach(importedContact => {
-                    if (!contacts.some(contact => contact.name === importedContact.name && contact.phone === importedContact.phone)) {
-                        contacts.push(importedContact);
-                    }
-                });
-                saveContacts();
-                displayContacts(contacts);
-                alert('Kontakte wurden erfolgreich importiert.');
-            };
-            reader.readAsText(file);
-        }
+    // Eindeutige ID generieren
+    function generateId() {
+      return '_' + Math.random().toString(36).substr(2, 9);
+    }
 
-        function saveContacts() {
-            localStorage.setItem('contacts', JSON.stringify(contacts));
-        }
-        function loadContacts() {
-            const savedContacts = localStorage.getItem('contacts');
-            if (savedContacts) {
-                contacts = JSON.parse(savedContacts);
-                displayContacts(contacts);
-            }
-        }
-        function saveUserProfile() {
-            localStorage.setItem('userProfile', JSON.stringify(userProfile));
-            updateAppTitle();
-        }
-        function loadUserProfile() {
-            const savedProfile = localStorage.getItem('userProfile');
-            if (savedProfile) {
-                userProfile = JSON.parse(savedProfile);
-                updateAppTitle();
-                setRandomEmoji();
-            }
-        }
-        function updateAppTitle() {
-            const userNameSpan = document.getElementById('userName');
-            userNameSpan.textContent = userProfile.name || '';
-        }
-        function setRandomEmoji() {
-            if (userProfile.name) {
-                const emojiSpan = document.getElementById('greetingEmoji');
-                const randomEmoji = friendlyEmojis[Math.floor(Math.random() * friendlyEmojis.length)];
-                emojiSpan.textContent = randomEmoji;
-            }
-        }
-        function displayContacts(contactsToShow) {
-            const contactList = document.getElementById('contactList');
-            contactList.innerHTML = '';
-            contactsToShow.sort((a, b) => a.name.localeCompare(b.name)).forEach((contact, index) => {
-                const li = document.createElement('li');
-                li.innerHTML = `<span class="contact-name">${contact.name}</span>`;
-                li.onclick = () => showContactDetails(index);
-                contactList.appendChild(li);
-            });
-        }
-        function searchContacts() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            lastSearchTerm = searchTerm;
-            const filteredContacts = contacts.filter(contact => 
-                contact.name.toLowerCase().startsWith(searchTerm) || 
-                contact.name.toLowerCase().includes(' ' + searchTerm)
-            );
-            displayContacts(filteredContacts);
-        }
-        function showNewContactForm() {
-            document.getElementById('mainView').classList.add('hidden');
-            document.getElementById('newContactView').classList.remove('hidden');
-        }
-        function showMainView() {
-            document.getElementById('mainView').classList.remove('hidden');
-            document.getElementById('newContactView').classList.add('hidden');
-            document.getElementById('contactDetailView').classList.add('hidden');
-            document.getElementById('editContactView').classList.add('hidden');
-            closeSideMenu();
-            document.getElementById('searchInput').value = lastSearchTerm;
-            searchContacts();
-        }
-        function showContactDetails(index) {
-            currentContactIndex = index;
-            const contact = contacts[index];
-            const detailsDiv = document.getElementById('contactDetails');
-            detailsDiv.innerHTML = `
-                <h2>${contact.name}</h2>
-                <a href="tel:${contact.phone}" class="contact-action">Anrufen: ${contact.phone}</a>
-                <a href="mailto:${contact.email}" class="contact-action">E-Mail: ${contact.email}</a>
-                ${contact.note ? `<p>Notiz: ${contact.note}</p>` : ''}
-                <div class="contact-actions">
-                    <button onclick="editContact()" class="btn-success">Bearbeiten</button>
-                    <button onclick="deleteContact()" class="btn-danger">Löschen</button>
-                </div>
-            `;
-            document.getElementById('mainView').classList.add('hidden');
-            document.getElementById('editContactView').classList.add('hidden');
-            document.getElementById('contactDetailView').classList.remove('hidden');
-        }
-        function editContact() {
-            const contact = contacts[currentContactIndex];
-            document.getElementById('editName').value = contact.name;
-            document.getElementById('editPhone').value = contact.phone;
-            document.getElementById('editEmail').value = contact.email;
-            document.getElementById('editNote').value = contact.note;
-            document.getElementById('contactDetailView').classList.add('hidden');
-            document.getElementById('editContactView').classList.remove('hidden');
-        }
-        function deleteContact() {
-            if (confirm('Möchten Sie diesen Kontakt wirklich löschen?')) {
-                contacts.splice(currentContactIndex, 1);
-                saveContacts();
-                showToast('Kontakt gelöscht');
-                showMainView();
-            }
-        }
-        function formatPhoneNumber(phone) {
-            if (phone.startsWith('+49')) {
-                return '0' + phone.slice(3);
-            }
-            return phone;
-        }
-        function toggleSideMenu() {
-            const sideMenu = document.getElementById('sideMenu');
-            sideMenu.classList.toggle('open');
-            if (sideMenu.classList.contains('open')) {
-                document.getElementById('userNameInput').value = userProfile.name || '';
-                document.getElementById('userPhone').value = userProfile.phone || '';
-                document.getElementById('userEmail').value = userProfile.email || '';
-            }
-        }
-        function closeSideMenu() {
-            const sideMenu = document.getElementById('sideMenu');
-            sideMenu.classList.remove('open');
-        }
-        function resetUserProfile() {
-            if (confirm('Möchten Sie Ihre persönlichen Daten wirklich zurücksetzen?')) {
-                userProfile = {};
-                saveUserProfile();
-                document.getElementById('userProfileForm').reset();
-                closeSideMenu();
-                updateAppTitle();
-                setRandomEmoji();
-            }
-        }
-        document.getElementById('contactForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const newContact = {
-                name: document.getElementById('name').value,
-                phone: formatPhoneNumber(document.getElementById('phone').value),
-                email: document.getElementById('email').value,
-                note: document.getElementById('note').value
-            };
-            contacts.push(newContact);
-            saveContacts();
-            this.reset();
-            showToast('Kontakt hinzugefügt');
-            showMainView();
+    // Kontakte aus localStorage laden
+    function loadContacts() {
+      const saved = localStorage.getItem('contacts');
+      if (saved) {
+        contacts = JSON.parse(saved);
+      }
+      displayContactList();
+    }
+
+    function saveContacts() {
+      localStorage.setItem('contacts', JSON.stringify(contacts));
+    }
+
+    // Exportfunktion (unverändert)
+    function exportContacts() {
+      const dataStr = JSON.stringify(contacts);
+      const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+      const linkElement = document.createElement('a');
+      linkElement.setAttribute('href', dataUri);
+      linkElement.setAttribute('download', 'contacts.json');
+      linkElement.click();
+    }
+
+    // Importfunktion (unverändert)
+    function importContacts(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const contents = e.target.result;
+        const importedContacts = JSON.parse(contents);
+        // Neue Kontakte hinzufügen (Duplikate anhand Vor- und Nachname + Telefon vermeiden)
+        importedContacts.forEach(ic => {
+          if (!contacts.some(c =>
+              c.firstName === ic.firstName &&
+              c.lastName === ic.lastName &&
+              c.phone === ic.phone
+            )) {
+            contacts.push(ic);
+          }
         });
-        document.getElementById('editContactForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            contacts[currentContactIndex] = {
-                name: document.getElementById('editName').value,
-                phone: formatPhoneNumber(document.getElementById('editPhone').value),
-                email: document.getElementById('editEmail').value,
-                note: document.getElementById('editNote').value
-            };
-            saveContacts();
-            showToast('Kontakt gespeichert');
-            showContactDetails(currentContactIndex);
-        });
-        document.getElementById('userProfileForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            userProfile = {
-                name: document.getElementById('userNameInput').value,
-                phone: formatPhoneNumber(document.getElementById('userPhone').value),
-                email: document.getElementById('userEmail').value
-            };
-            saveUserProfile();
-            closeSideMenu();
-            setRandomEmoji();
-            showToast('Profil gespeichert');
-        });
-        document.getElementById('searchInput').addEventListener('input', searchContacts);
-        window.addEventListener('load', function() {
-            loadContacts();
-            loadUserProfile();
-            setRandomEmoji();
-        });
-        document.addEventListener('click', function(event) {
-            const sideMenu = document.getElementById('sideMenu');
-            const menuBtn = document.querySelector('.menu-btn');
-            if (!sideMenu.contains(event.target) && event.target !== menuBtn) {
-                closeSideMenu();
-            }
-        });
-    </script>
+        saveContacts();
+        displayContactList();
+        alert('Kontakte wurden erfolgreich importiert.');
+      };
+      reader.readAsText(file);
+    }
+
+    // Anzeige der Kontaktliste
+    function displayContactList() {
+      const list = document.getElementById('contactList');
+      list.innerHTML = '';
+      // Sortierung nach Nachname, dann Vorname
+      contacts.sort((a, b) => {
+        if (a.lastName === b.lastName) {
+          return a.firstName.localeCompare(b.firstName);
+        }
+        return a.lastName.localeCompare(b.lastName);
+      });
+      contacts.forEach(contact => {
+        const li = document.createElement('li');
+        li.textContent = contact.firstName + ' ' + contact.lastName;
+        li.onclick = () => showContactDetail(contact.id);
+        if (contact.id === selectedContactId) {
+          li.classList.add('active');
+        }
+        list.appendChild(li);
+      });
+    }
+
+    // Suchfunktion
+    function searchContacts() {
+      const term = document.getElementById('searchInput').value.toLowerCase();
+      const listItems = document.querySelectorAll('#contactList li');
+      listItems.forEach(li => {
+        li.style.display = li.textContent.toLowerCase().includes(term) ? '' : 'none';
+      });
+    }
+
+    // Detailansicht eines Kontakts anzeigen
+    function showContactDetail(id) {
+      selectedContactId = id;
+      displayContactList();
+      const contact = contacts.find(c => c.id === id);
+      const detail = document.getElementById('detailView');
+      if (!contact) {
+        detail.innerHTML = '<p>Kontakt nicht gefunden.</p>';
+        return;
+      }
+      detail.innerHTML = `
+        <div>
+          ${contact.image ? `<img src="${contact.image}" alt="Foto">` : ''}
+          <h2>${contact.firstName} ${contact.lastName}</h2>
+          ${contact.company ? `<p class="detail-field"><strong>Firma:</strong> ${contact.company}</p>` : ''}
+          ${contact.title ? `<p class="detail-field"><strong>Position:</strong> ${contact.title}</p>` : ''}
+          ${contact.phone ? `<p class="detail-field"><strong>Telefon:</strong> ${contact.phone}</p>` : ''}
+          ${contact.mobile ? `<p class="detail-field"><strong>Mobil:</strong> ${contact.mobile}</p>` : ''}
+          ${contact.email ? `<p class="detail-field"><strong>E-Mail:</strong> ${contact.email}</p>` : ''}
+          ${(contact.street || contact.city || contact.postalCode || contact.country) ? 
+            `<p class="detail-field"><strong>Adresse:</strong> ${contact.street || ''} ${contact.postalCode || ''} ${contact.city || ''} ${contact.country || ''}</p>` 
+            : ''}
+          ${contact.birthday ? `<p class="detail-field"><strong>Geburtstag:</strong> ${contact.birthday}</p>` : ''}
+          ${contact.url ? `<p class="detail-field"><strong>Website:</strong> <a href="${contact.url}" target="_blank">${contact.url}</a></p>` : ''}
+          ${contact.note ? `<p class="detail-field"><strong>Notizen:</strong> ${contact.note}</p>` : ''}
+          <div class="action-buttons">
+            <button class="btn-edit" onclick="openEditModal('${contact.id}')">Bearbeiten</button>
+            <button class="btn-delete" onclick="deleteContact('${contact.id}')">Löschen</button>
+          </div>
+        </div>
+      `;
+    }
+
+    // Modal öffnen zum Hinzufügen eines neuen Kontakts
+    function openAddModal() {
+      selectedContactId = null;
+      document.getElementById('modalTitle').textContent = 'Neuer Kontakt';
+      document.getElementById('contactForm').reset();
+      document.getElementById('contactId').value = '';
+      document.getElementById('contactModal').classList.remove('hidden');
+    }
+
+    // Modal öffnen zum Bearbeiten
+    function openEditModal(id) {
+      const contact = contacts.find(c => c.id === id);
+      if (!contact) return;
+      selectedContactId = id;
+      document.getElementById('modalTitle').textContent = 'Kontakt bearbeiten';
+      document.getElementById('firstName').value   = contact.firstName;
+      document.getElementById('lastName').value    = contact.lastName;
+      document.getElementById('company').value     = contact.company || '';
+      document.getElementById('title').value       = contact.title || '';
+      document.getElementById('phone').value       = contact.phone || '';
+      document.getElementById('mobile').value      = contact.mobile || '';
+      document.getElementById('email').value       = contact.email || '';
+      document.getElementById('street').value      = contact.street || '';
+      document.getElementById('postalCode').value  = contact.postalCode || '';
+      document.getElementById('city').value        = contact.city || '';
+      document.getElementById('country').value     = contact.country || '';
+      document.getElementById('birthday').value    = contact.birthday || '';
+      document.getElementById('url').value         = contact.url || '';
+      document.getElementById('note').value        = contact.note || '';
+      document.getElementById('image').value       = contact.image || '';
+      document.getElementById('contactId').value   = contact.id;
+      document.getElementById('contactModal').classList.remove('hidden');
+    }
+
+    // Modal schließen
+    function closeModal() {
+      document.getElementById('contactModal').classList.add('hidden');
+    }
+
+    // Kontakt speichern (neu oder aktualisieren)
+    function saveContact() {
+      const contactData = {
+        id: document.getElementById('contactId').value || generateId(),
+        firstName: document.getElementById('firstName').value,
+        lastName: document.getElementById('lastName').value,
+        company: document.getElementById('company').value,
+        title: document.getElementById('title').value,
+        phone: document.getElementById('phone').value,
+        mobile: document.getElementById('mobile').value,
+        email: document.getElementById('email').value,
+        street: document.getElementById('street').value,
+        postalCode: document.getElementById('postalCode').value,
+        city: document.getElementById('city').value,
+        country: document.getElementById('country').value,
+        birthday: document.getElementById('birthday').value,
+        url: document.getElementById('url').value,
+        note: document.getElementById('note').value,
+        image: document.getElementById('image').value
+      };
+
+      const index = contacts.findIndex(c => c.id === contactData.id);
+      if (index > -1) {
+        contacts[index] = contactData;
+      } else {
+        contacts.push(contactData);
+      }
+      saveContacts();
+      displayContactList();
+      showContactDetail(contactData.id);
+      closeModal();
+    }
+
+    // Kontakt löschen
+    function deleteContact(id) {
+      if (!confirm('Möchten Sie diesen Kontakt wirklich löschen?')) return;
+      contacts = contacts.filter(c => c.id !== id);
+      saveContacts();
+      selectedContactId = null;
+      document.getElementById('detailView').innerHTML = '<p>Wähle einen Kontakt aus der Liste, um die Details anzuzeigen.</p>';
+      displayContactList();
+    }
+
+    window.onload = loadContacts;
+  </script>
 </body>
 </html>
