@@ -5,98 +5,137 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kontakte</title>
   <style>
-    /* Basis-Styling à la Apple */
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f2f2f2;
-      color: #333;
+    :root {
+      --background: #1c1c1e;
+      --surface: #2c2c2e;
+      --accent: #0a84ff;
+      --text: #ffffff;
+      --secondaryText: #8e8e93;
+      --border: #3a3a3c;
+      --error: #ff453a;
+      --success: #32d74b;
     }
+    
+    * {
+      box-sizing: border-box;
+    }
+    
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--background);
+      color: var(--text);
+    }
+    
     header {
-      background-color: #fff;
+      background-color: var(--surface);
       padding: 10px 20px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
       display: flex;
       align-items: center;
       justify-content: space-between;
+      border-bottom: 1px solid var(--border);
     }
+    
     header h1 {
       font-size: 24px;
       margin: 0;
+      color: var(--text);
     }
+    
     header button {
       background: none;
       border: none;
       font-size: 24px;
+      color: var(--accent);
       cursor: pointer;
       margin-left: 10px;
     }
+    
     .search-bar {
       padding: 10px 20px;
-      background-color: #fff;
-      border-bottom: 1px solid #ddd;
+      background-color: var(--surface);
+      border-bottom: 1px solid var(--border);
     }
+    
     .search-bar input {
       width: 100%;
       padding: 8px;
       font-size: 16px;
-      border: 1px solid #ccc;
+      background-color: var(--background);
+      border: 1px solid var(--border);
       border-radius: 4px;
+      color: var(--text);
     }
+    
     .container {
       display: flex;
       height: calc(100vh - 120px);
     }
+    
     .sidebar {
       width: 300px;
-      background-color: #fff;
-      border-right: 1px solid #ddd;
+      background-color: var(--surface);
+      border-right: 1px solid var(--border);
       overflow-y: auto;
     }
+    
     .content {
       flex-grow: 1;
       padding: 20px;
       overflow-y: auto;
-      background-color: #fff;
+      background-color: var(--background);
     }
+    
     .contact-list {
       list-style: none;
       margin: 0;
       padding: 0;
     }
+    
     .contact-list li {
       padding: 15px 20px;
-      border-bottom: 1px solid #eee;
+      border-bottom: 1px solid var(--border);
       cursor: pointer;
+      color: var(--text);
     }
+    
     .contact-list li:hover {
-      background-color: #f9f9f9;
+      background-color: rgba(10, 132, 255, 0.2);
     }
+    
     .contact-list li.active {
-      background-color: #e6f7ff;
+      background-color: rgba(10, 132, 255, 0.4);
     }
-    /* Detailansicht */
+    
     .detail-view img {
       width: 100px;
       height: 100px;
       border-radius: 50%;
       object-fit: cover;
       margin-bottom: 15px;
+      border: 2px solid var(--border);
     }
+    
     .detail-view h2 {
       margin-top: 0;
+      font-size: 28px;
     }
+    
     .detail-field {
       margin-bottom: 10px;
+      font-size: 16px;
     }
+    
     .detail-field strong {
       display: inline-block;
       width: 100px;
+      color: var(--secondaryText);
     }
+    
     .action-buttons {
       margin-top: 20px;
     }
+    
     .action-buttons button {
       padding: 10px 15px;
       margin-right: 10px;
@@ -105,68 +144,106 @@
       cursor: pointer;
       font-size: 16px;
     }
-    .btn-edit { background-color: #007aff; color: #fff; }
-    .btn-delete { background-color: #ff3b30; color: #fff; }
-    .btn-add    { background-color: #34c759; color: #fff; }
-    .btn-export, .btn-import { background-color: #8e8e93; color: #fff; }
-    .hidden { display: none; }
-
-    /* Modal für Hinzufügen/Bearbeiten */
+    
+    .btn-edit {
+      background-color: var(--accent);
+      color: var(--text);
+    }
+    
+    .btn-delete {
+      background-color: var(--error);
+      color: var(--text);
+    }
+    
+    .btn-add {
+      background-color: var(--success);
+      color: var(--text);
+    }
+    
+    .btn-export,
+    .btn-import {
+      background-color: var(--secondaryText);
+      color: var(--background);
+      font-size: 18px;
+    }
+    
+    .hidden {
+      display: none;
+    }
+    
+    /* Modal-Styling */
     .modal {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background-color: rgba(0,0,0,0.5);
+      background-color: rgba(0,0,0,0.6);
       display: flex;
       align-items: center;
       justify-content: center;
       z-index: 1000;
     }
+    
     .modal-content {
-      background-color: #fff;
+      background-color: var(--surface);
       padding: 20px;
       border-radius: 8px;
       max-width: 600px;
       width: 100%;
       max-height: 90vh;
       overflow-y: auto;
+      color: var(--text);
     }
+    
     .modal-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
+    
     .modal-header h2 {
       margin: 0;
+      font-size: 22px;
     }
+    
     .modal-header button {
       background: none;
       border: none;
       font-size: 24px;
+      color: var(--accent);
       cursor: pointer;
     }
+    
     .modal-body {
       margin-top: 20px;
     }
+    
     .modal-body label {
       display: block;
       margin-bottom: 5px;
       font-weight: bold;
+      font-size: 14px;
+      color: var(--secondaryText);
     }
+    
     .modal-body input,
     .modal-body textarea {
       width: 100%;
       padding: 8px;
       margin-bottom: 10px;
-      border: 1px solid #ccc;
+      border: 1px solid var(--border);
       border-radius: 4px;
+      background-color: var(--background);
+      color: var(--text);
       font-size: 16px;
     }
+    
     .modal-footer {
       text-align: right;
+      margin-top: 10px;
     }
+    
     .modal-footer button {
       padding: 10px 15px;
       margin-left: 10px;
@@ -175,10 +252,17 @@
       cursor: pointer;
       font-size: 16px;
     }
-    .btn-save { background-color: #007aff; color: #fff; }
-    .btn-cancel { background-color: #8e8e93; color: #fff; }
-
-    /* Responsive */
+    
+    .btn-save {
+      background-color: var(--accent);
+      color: var(--text);
+    }
+    
+    .btn-cancel {
+      background-color: var(--secondaryText);
+      color: var(--background);
+    }
+    
     @media (max-width: 768px) {
       .container {
         flex-direction: column;
@@ -187,7 +271,7 @@
       .sidebar {
         width: 100%;
         border-right: none;
-        border-bottom: 1px solid #ddd;
+        border-bottom: 1px solid var(--border);
       }
     }
   </style>
@@ -270,13 +354,11 @@
   <script>
     let contacts = [];
     let selectedContactId = null;
-
-    // Eindeutige ID generieren
+    
     function generateId() {
       return '_' + Math.random().toString(36).substr(2, 9);
     }
-
-    // Kontakte aus localStorage laden
+    
     function loadContacts() {
       const saved = localStorage.getItem('contacts');
       if (saved) {
@@ -284,12 +366,11 @@
       }
       displayContactList();
     }
-
+    
     function saveContacts() {
       localStorage.setItem('contacts', JSON.stringify(contacts));
     }
-
-    // Exportfunktion (unverändert)
+    
     function exportContacts() {
       const dataStr = JSON.stringify(contacts);
       const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
@@ -298,8 +379,7 @@
       linkElement.setAttribute('download', 'contacts.json');
       linkElement.click();
     }
-
-    // Importfunktion (unverändert)
+    
     function importContacts(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -307,13 +387,8 @@
       reader.onload = function(e) {
         const contents = e.target.result;
         const importedContacts = JSON.parse(contents);
-        // Neue Kontakte hinzufügen (Duplikate anhand Vor- und Nachname + Telefon vermeiden)
         importedContacts.forEach(ic => {
-          if (!contacts.some(c =>
-              c.firstName === ic.firstName &&
-              c.lastName === ic.lastName &&
-              c.phone === ic.phone
-            )) {
+          if (!contacts.some(c => c.firstName === ic.firstName && c.lastName === ic.lastName && c.phone === ic.phone)) {
             contacts.push(ic);
           }
         });
@@ -323,12 +398,10 @@
       };
       reader.readAsText(file);
     }
-
-    // Anzeige der Kontaktliste
+    
     function displayContactList() {
       const list = document.getElementById('contactList');
       list.innerHTML = '';
-      // Sortierung nach Nachname, dann Vorname
       contacts.sort((a, b) => {
         if (a.lastName === b.lastName) {
           return a.firstName.localeCompare(b.firstName);
@@ -345,8 +418,7 @@
         list.appendChild(li);
       });
     }
-
-    // Suchfunktion
+    
     function searchContacts() {
       const term = document.getElementById('searchInput').value.toLowerCase();
       const listItems = document.querySelectorAll('#contactList li');
@@ -354,8 +426,7 @@
         li.style.display = li.textContent.toLowerCase().includes(term) ? '' : 'none';
       });
     }
-
-    // Detailansicht eines Kontakts anzeigen
+    
     function showContactDetail(id) {
       selectedContactId = id;
       displayContactList();
@@ -378,7 +449,7 @@
             `<p class="detail-field"><strong>Adresse:</strong> ${contact.street || ''} ${contact.postalCode || ''} ${contact.city || ''} ${contact.country || ''}</p>` 
             : ''}
           ${contact.birthday ? `<p class="detail-field"><strong>Geburtstag:</strong> ${contact.birthday}</p>` : ''}
-          ${contact.url ? `<p class="detail-field"><strong>Website:</strong> <a href="${contact.url}" target="_blank">${contact.url}</a></p>` : ''}
+          ${contact.url ? `<p class="detail-field"><strong>Website:</strong> <a href="${contact.url}" target="_blank" style="color: var(--accent);">${contact.url}</a></p>` : ''}
           ${contact.note ? `<p class="detail-field"><strong>Notizen:</strong> ${contact.note}</p>` : ''}
           <div class="action-buttons">
             <button class="btn-edit" onclick="openEditModal('${contact.id}')">Bearbeiten</button>
@@ -387,8 +458,7 @@
         </div>
       `;
     }
-
-    // Modal öffnen zum Hinzufügen eines neuen Kontakts
+    
     function openAddModal() {
       selectedContactId = null;
       document.getElementById('modalTitle').textContent = 'Neuer Kontakt';
@@ -396,8 +466,7 @@
       document.getElementById('contactId').value = '';
       document.getElementById('contactModal').classList.remove('hidden');
     }
-
-    // Modal öffnen zum Bearbeiten
+    
     function openEditModal(id) {
       const contact = contacts.find(c => c.id === id);
       if (!contact) return;
@@ -421,13 +490,11 @@
       document.getElementById('contactId').value   = contact.id;
       document.getElementById('contactModal').classList.remove('hidden');
     }
-
-    // Modal schließen
+    
     function closeModal() {
       document.getElementById('contactModal').classList.add('hidden');
     }
-
-    // Kontakt speichern (neu oder aktualisieren)
+    
     function saveContact() {
       const contactData = {
         id: document.getElementById('contactId').value || generateId(),
@@ -447,7 +514,7 @@
         note: document.getElementById('note').value,
         image: document.getElementById('image').value
       };
-
+      
       const index = contacts.findIndex(c => c.id === contactData.id);
       if (index > -1) {
         contacts[index] = contactData;
@@ -459,8 +526,7 @@
       showContactDetail(contactData.id);
       closeModal();
     }
-
-    // Kontakt löschen
+    
     function deleteContact(id) {
       if (!confirm('Möchten Sie diesen Kontakt wirklich löschen?')) return;
       contacts = contacts.filter(c => c.id !== id);
@@ -469,7 +535,7 @@
       document.getElementById('detailView').innerHTML = '<p>Wähle einen Kontakt aus der Liste, um die Details anzuzeigen.</p>';
       displayContactList();
     }
-
+    
     window.onload = loadContacts;
   </script>
 </body>
